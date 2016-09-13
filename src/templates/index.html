@@ -1,0 +1,61 @@
+{% load static %}
+<html>
+<head>
+
+	<title>Fibonacci</title>
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+</head>
+
+<body>
+
+	<div class='row'>	
+		<div class='col-sm-6 col-sm-offset-3'>
+			<div class="page-header">
+				<h4>Fibonacci Sequence Till Nth Number</h4>
+			</div>
+			<form method='POST' action='' enctype='multipart/form-data' id='fibonacci-form'> {%csrf_token%}
+			
+				Enter the value of N : <input type='text' id='nterms'> <br><br>
+				<div id='results'> </div> 
+				<img src="{% static 'img/loader.gif' %}" id="img" style="display:none"/>
+				<br>
+				<input type='Submit' id='submit' value='Calculate'>
+
+			</form>
+		</div>
+	</div>
+
+</body>
+
+<script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+<script type="text/javascript">
+
+	$(document).on('submit','#fibonacci-form',function(e){
+		e.preventDefault();
+		$('#img').show();
+		$.ajax({
+			type:'POST',
+			url:'/fibonacci/calculate/',
+			data: {
+				nterms: $('#nterms').val(),
+				csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+			},
+			success:function(json){
+				$('#img').hide();
+				console.log(json);
+				$("#results").html("<strong style='color:#0F5BD1;'> The "+json.nterms+"th Term of the Fibonacci Series is <em style='color:#0A3D8C;'>"+json.value+"</em>.<br> Total computation time is <em style='color:#0A3D8C;'>"+json.computation_time+"</em> seconds </strong> ");
+				console.log("success");
+			},
+			error : function(xhr,errmsg,err) {
+				$('#img').hide();
+	            $('#results').html("<strong style='color:#D32B07;'>Error! Please enter a Valid Value </strong>"); 
+	            console.log(xhr.status + ": " + xhr.responseText); 
+        }
+
+		});
+	});
+</script>
+</html>
